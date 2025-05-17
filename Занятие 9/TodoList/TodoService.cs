@@ -4,29 +4,54 @@ namespace TodoList
 {
 	public class TodoService
 	{
-		public async Task<TodoItem> AddTodo(TodoItem item)
+		private readonly AppDbContext _context;
+
+		public TodoService(AppDbContext context)
 		{
-			throw new NotImplementedException();
+			_context = context;
 		}
 
-		public async Task<TodoItem>? UpdateTodo(TodoItem item)
+		public async Task<TodoItem> AddTodo(TodoItem item)
 		{
-			throw new NotImplementedException();
+			_context.Todos.Add(item);
+			await _context.SaveChangesAsync();
+			return item;
+		}
+
+		public async Task<TodoItem?> UpdateTodo(TodoItem item)
+		{
+			var existingTodo = await _context.Todos.FindAsync(item.Id);
+			if (existingTodo == null)
+			{
+				return null;
+			}
+
+			existingTodo.Text = item.Text;
+			existingTodo.IsCompleted = item.IsCompleted;
+			existingTodo.EndTime = item.IsCompleted ? DateTime.Now : null;
+
+			await _context.SaveChangesAsync();
+			return existingTodo;
 		}
 
 		public async Task DeleteTodo(Guid id)
 		{
-			throw new NotImplementedException();
+			var todoToDelete = await _context.Todos.FindAsync(id);
+			if (todoToDelete != null)
+			{
+				_context.Todos.Remove(todoToDelete);
+				await _context.SaveChangesAsync();
+			}
 		}
 
 		public async Task<List<TodoItem>> GetAllTodos()
 		{
-			throw new NotImplementedException();
+			return await _context.Todos.ToListAsync();
 		}
 
-		public async Task<TodoItem>? GetByIdTodos(Guid id)
+		public async Task<TodoItem?> GetByIdTodos(Guid id)
 		{
-			throw new NotImplementedException();
+			return await _context.Todos.FindAsync(id);
 		}
 	}
 }

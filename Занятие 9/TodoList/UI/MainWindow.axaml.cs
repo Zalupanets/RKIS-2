@@ -1,23 +1,20 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Interactivity;
 using System.Collections.ObjectModel;
+using Splat;
 
 namespace TodoList.UI
 {
-	public class TodoItemWithEditing
-	{
-		public TodoItem Todo { get; set; }
-		public bool IsEditing { get; set; }
-	}
-
 	public partial class MainWindow : Window
 	{
-		private readonly TodoService _todoService = new();
+		private readonly TodoService _todoService;
 		private ObservableCollection<TodoItemWithEditing> _todos = new();
 
 		public MainWindow()
 		{
 			InitializeComponent();
+
+			_todoService = Locator.Current.GetService<TodoService>()!;
 			TodosItemsControl.ItemsSource = _todos;
 			LoadTodos();
 		}
